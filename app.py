@@ -44,15 +44,22 @@ def login():
 
     if not check_password_hash(user.password, password):
         return jsonify({"msg": "nombre/contraseña incorrectos"}), 400
+    
+    if username == "admin" and password == "admin":
+        expires = datetime.timedelta(days=1)
+        token = create_access_token (identify=username, expires_delta=expires)
+        data = {
+        "access_token": access_token,
+        "user": {
+            "username": username
+            } 
+        }
+        return jsonify(data), 200
+    else:
+        return jsonify({"msg": "Bad username or password"}), 400
 
-    expires = datetime.timedelta(days=1)
 
     access_token = create_access_token(identity=user.id, expires_delta=expires)
-
-    data = {
-        "access_token": access_token,
-        "user": user.serialize()
-    }
 
     return jsonify(data), 200
 
@@ -95,6 +102,8 @@ def register():
     }
 
     return jsonify(data), 200
+
+    return jsonify ({"access_token": "", "user": ""}), 200
 
 #/PROFILE
 @app.route("/API/Profile/", methods=['GET'])
